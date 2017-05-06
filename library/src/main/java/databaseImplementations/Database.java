@@ -1,4 +1,4 @@
-package database;
+package databaseImplementations;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 
 import databaseInterfaces.IDatabase;
 import databaseInterfaces.IDatabaseElement;
-import databaseInterfaces.IFactory;
+import databaseInterfaces.IStringableFactory;
 import databaseInterfaces.IStringable;
 import il.ac.technion.cs.sd.book.ext.LineStorage;
 import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
@@ -16,14 +16,14 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 
 	LineStorage lineStorageKeys;
 	LineStorage lineStorageValues;
-	IFactory<Key> keyFactory;
-	IFactory<Value> valueFactory;
+	IStringableFactory<Key> keyFactory;
+	IStringableFactory<Value> valueFactory;
 	
 	private final String KEYS = "Keys";
 	private final String VALUES = "Values";
 	
 	@Inject
-	Database(LineStorageFactory lineStorageFactory, IFactory<Key> keyFactory, IFactory<Value> valueFactory, String databaseName) {
+	Database(LineStorageFactory lineStorageFactory, IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory, String databaseName) {
 		this.lineStorageKeys = lineStorageFactory.open(databaseName + KEYS);
 		this.lineStorageValues = lineStorageFactory.open(databaseName + VALUES);
 		this.keyFactory = keyFactory;

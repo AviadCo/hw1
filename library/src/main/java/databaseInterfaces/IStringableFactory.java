@@ -1,5 +1,5 @@
 package databaseInterfaces;
 
-public interface IFactory<Value> {
+public interface IStringableFactory<Value> {
 	Value create(String s);
 }
