@@ -2,6 +2,8 @@ package il.ac.technion.cs.sd.book.test;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
+import il.ac.technion.cs.sd.book.app.BookScoreReader;
 import il.ac.technion.cs.sd.book.ext.LineStorageModule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ExampleTest {
 
-  @Rule public Timeout globalTimeout = Timeout.seconds(20);
+  //@Rule public Timeout globalTimeout = Timeout.seconds(20);
 
   private static BookScoreReader setupAndGetReader(String fileName) throws FileNotFoundException {
     String fileContents =

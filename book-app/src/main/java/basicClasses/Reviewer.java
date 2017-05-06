@@ -13,9 +13,9 @@ public class Reviewer implements IDatabaseElement<ID, Reviewer>, IStringable {
 	private List<Review> reviewslist;
 
 	public final static String REVIEWER_SPLITER = ",";
-	
+		
 	Reviewer(String id, String[] reviewslist) {
-		this.id = (ID) this.id.parseObjectFromString(id);
+		this.id = new ID(id);
 		this.reviewslist = new ArrayList<>();
 		
 		for (String review : reviewslist ) {			
@@ -23,6 +23,16 @@ public class Reviewer implements IDatabaseElement<ID, Reviewer>, IStringable {
 		}
 	}
 	
+	public Reviewer(String id) {
+		this.id = new ID(id);
+		this.reviewslist = new ArrayList<>();
+	}
+	
+	public Reviewer(ID id, List<Review> reviewslist) {
+		this.id = id;
+		this.reviewslist = reviewslist;
+	}
+
 	@Override
 	public ID getKey() {
 		return id;
@@ -51,5 +61,13 @@ public class Reviewer implements IDatabaseElement<ID, Reviewer>, IStringable {
 		String[] parsedString = s.split(REVIEWER_SPLITER);
 
 		return new Reviewer(parsedString[0], Arrays.copyOfRange(parsedString, 1, parsedString.length));
+	}
+
+	public void addReview(Review review) {
+		reviewslist.add(review);
+	}
+	
+	public List<Review> getReviewsList() {
+		return reviewslist;
 	}
 }

@@ -24,5 +24,14 @@ public class ID implements Comparable<ID>, IStringable{
 	public int compareTo(ID other) {
 		return id.compareTo(other.id);
 	}
+	
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ID && id.equals(((ID) obj).id);
+    }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

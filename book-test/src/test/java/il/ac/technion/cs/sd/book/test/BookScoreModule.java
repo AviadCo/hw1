@@ -2,10 +2,13 @@ package il.ac.technion.cs.sd.book.test;
 
 import com.google.inject.AbstractModule;
 
+import bookScoreImplementations.BookScoreManager;
+import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
+
 // This module is in the testing project, so that it could easily bind all dependencies from all levels.
-public class BookScoreModule extends AbstractModule {
+class BookScoreModule extends AbstractModule {
   @Override
   protected void configure() {
-    throw new UnsupportedOperationException("Not implemented");
+	  bind(BookScoreInitializer.class).to(BookScoreManager.class);
   }
 }

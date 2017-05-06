@@ -4,13 +4,18 @@ import databaseInterfaces.IStringable;
 
 public class Review implements IStringable {
 	private ID id;
-	private Integer grade;
+	private Integer score;
 	
 	public final static String REVIEW_SPLITER = " ";
 	
-	Review(String id, String grade) {
-		this.id = (ID) this.id.parseObjectFromString(id);
-		this.grade = Integer.valueOf(grade);
+	public Review(ID id, Integer score) {
+		this.id = id;
+		this.score = score;
+	}
+	
+	public Review(String id, String score) {
+		this.id = new ID(id);
+		this.score = Integer.valueOf(score);
 	}
 			
 	public static Review parseReviewFromString(String s) {
@@ -19,9 +24,25 @@ public class Review implements IStringable {
 		return new Review(review[0], review[1]);
 	}
 	
+	public ID getId() {
+		return id;
+	}
+
+	public void setId(ID id) {
+		this.id = id;
+	}
+
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
 	@Override
 	public String parseObjectToString() {
-		return id.parseObjectToString() + REVIEW_SPLITER + Integer.toString(grade);
+		return id.parseObjectToString() + REVIEW_SPLITER + Integer.toString(score);
 	}
 	
 	@Override

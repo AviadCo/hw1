@@ -14,6 +14,11 @@ public class Book implements IDatabaseElement<ID, Book >, IStringable {
 
 	public final static String REVIEWER_SPLITER = ",";
 	
+	public Book (ID id) {
+		this.id = id;
+		this.reviewslist = new ArrayList<>();
+	}
+	
 	Book(String id, String[] reviewslist) {
 		this.id = (ID) this.id.parseObjectFromString(id);
 		this.reviewslist = new ArrayList<>();
@@ -51,5 +56,13 @@ public class Book implements IDatabaseElement<ID, Book >, IStringable {
 		String[] parsedString = s.split(REVIEWER_SPLITER);
 
 		return new Reviewer(parsedString[0], Arrays.copyOfRange(parsedString, 1, parsedString.length));
+	}
+	
+	public void addReview(Review review) {
+		reviewslist.add(review);
+	}
+	
+	public List<Review> getReviewsList() {
+		return reviewslist;
 	}
 }

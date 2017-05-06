@@ -1,4 +1,4 @@
-package il.ac.technion.cs.sd.book.test;
+package il.ac.technion.cs.sd.book.app;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
  * {@link BookScoreInitializer#setup(java.lang.String) has been called}.
  */
 public interface BookScoreReader {
-  /** Returns true iff reviewer reviewer has reviewed the book. If the reviewer or book do not exist, returns false. */
+  /** Returns true iff reviewer has reviewed the book. If the reviewer or book do not exist, returns false. */
   boolean gaveReview(String reviewerId, String bookId);
 
   /**
@@ -46,10 +46,8 @@ public interface BookScoreReader {
    * Returns the grades of all the reviewers who reviewed the book, as a map from reviewer ID to their review score.
    * If the book does not exist, return an empty map.
    */
-  Map<String, Integer> getReviewsForBook(String reviewerId);
+  Map<String, Integer> getReviewsForBook(String bookId);
 
-  /**
-   * Returns the average review score of the book. If the book does not exist, returns empty.
-   */
+  /** Returns the average review score of the book. If the book does not exist, returns empty. */
   OptionalDouble getAverageReviewScoreForBook(String bookId);
 }

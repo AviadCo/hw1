@@ -12,6 +12,11 @@
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
         <exclude>**/*.log</exclude>
+        <exclude>**/*.classpath</exclude>
+        <exclude>**/*.project</exclude>
+        <exclude>**/*.settings</exclude>
+        <exclude>**/*.idea</exclude>
+        <exclude>**/*.iml</exclude>
         <exclude>**/${project.build.directory}/**</exclude>
       </excludes>
     </fileSet>
