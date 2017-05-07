@@ -19,8 +19,7 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 	
 	@Inject
 	public Database(LineStorage lineStorageKeys, LineStorage lineStorageValues,
-					IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory,
-					String databaseName) {
+					IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory) {
 		this.lineStorageKeys = lineStorageKeys;
 		this.lineStorageValues = lineStorageValues;
 		this.keyFactory = keyFactory;
