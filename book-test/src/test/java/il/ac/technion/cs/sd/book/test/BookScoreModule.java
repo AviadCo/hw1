@@ -2,6 +2,7 @@ package il.ac.technion.cs.sd.book.test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
 import basicClasses.Book;
 import basicClasses.Reviewer;
@@ -30,7 +31,7 @@ class BookScoreModule extends AbstractModule {
   }
   
   @Provides
-  Database<String, Reviewer> createReviewerDatabase() {
+  @Singleton Database<String, Reviewer> createReviewerDatabase() {
 	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
 
 	  return new Database<String, Reviewer>(lineStorageFactory.open(REVIEWERS_DATA_BASE_NAME + KEYS),
@@ -39,7 +40,7 @@ class BookScoreModule extends AbstractModule {
   }
   
   @Provides
-  Database<String, Book> createBookDatabase() {
+  @Singleton Database<String, Book> createBookDatabase() {
 	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
 
 	  return new Database<String, Book>(lineStorageFactory.open(BOOKS_DATA_BASE_NAME + KEYS),

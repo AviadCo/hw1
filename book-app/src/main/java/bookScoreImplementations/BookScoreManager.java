@@ -140,6 +140,9 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 					.stream()
 					.forEach( r-> booksIDs.add(r.getId()));
 		
+		//TODO the test check in order
+		Collections.sort(booksIDs);
+		
 		return booksIDs;
 	}
 
