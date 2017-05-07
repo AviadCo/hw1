@@ -42,7 +42,7 @@ public class Review implements IStringable {
 
 	@Override
 	public String parseObjectToString() {
-		return id.parseObjectToString() + REVIEW_SPLITER + Integer.toString(score);
+		return id.parseObjectToString() + REVIEW_SPLITER + Double.toString(score);
 	}
 	
 	@Override
