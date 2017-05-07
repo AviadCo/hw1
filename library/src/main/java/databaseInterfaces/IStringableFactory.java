@@ -1,5 +1,6 @@
 package databaseInterfaces;
 
 public interface IStringableFactory<Value> {
-	Value create(String s);
+	Value createObject(String s);
+	String createString(Value v);
 }

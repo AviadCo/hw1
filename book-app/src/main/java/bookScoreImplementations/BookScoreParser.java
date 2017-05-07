@@ -15,7 +15,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import basicClasses.ID;
 import basicClasses.Review;
 import basicClasses.Reviewer;
 
@@ -31,7 +30,7 @@ public class BookScoreParser {
 	 */
 	public static List<Reviewer> createListOfReviewers(String xml) throws Exception
 	{
-		Map<ID, Reviewer> reviewerMap = new HashMap<ID, Reviewer> ();
+		Map<String, Reviewer> reviewerMap = new HashMap<String, Reviewer> ();
 		
 		Document doc = loadXMLFromString(xml);
 		
@@ -58,8 +57,8 @@ public class BookScoreParser {
             	if (reviewerMap.containsKey(currentReviewer.getKey())) {
             		Reviewer sameReviewer = reviewerMap.get(currentReviewer.getKey());
             		
-            		List<Review> allReviewes = new ArrayList<>(sameReviewer.getReviewsList());
-            		allReviewes.addAll(currentReviewer.getReviewsList());
+            		List<Review> allReviewes = new ArrayList<>(sameReviewer.getReviewslist());
+            		allReviewes.addAll(currentReviewer.getReviewslist());
             		
             		reviewerMap.put(currentReviewer.getKey(), new Reviewer(currentReviewer.getKey(), allReviewes));
             	} else {

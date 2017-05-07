@@ -8,11 +8,10 @@ import com.google.inject.Inject;
 import databaseInterfaces.IDatabase;
 import databaseInterfaces.IDatabaseElement;
 import databaseInterfaces.IStringableFactory;
-import databaseInterfaces.IStringable;
 import il.ac.technion.cs.sd.book.ext.LineStorage;
 import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
 
-public class Database<Key extends Comparable<Key> & IStringable, Value extends IStringable> implements IDatabase<Key, Value> {
+public class Database<Key extends Comparable<Key>, Value> implements IDatabase<Key, Value> {
 
 	LineStorage lineStorageKeys;
 	LineStorage lineStorageValues;
@@ -32,7 +31,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	
 	private Value getValueByIndex(int index) {
 		try {
-			return valueFactory.create(lineStorageValues.read(index));
+			return valueFactory.createObject(lineStorageValues.read(index));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			
@@ -42,7 +41,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	
 	private Key getKeyByIndex(int index) {
 		try {
-			return keyFactory.create(lineStorageKeys.read(index));
+			return keyFactory.createObject(lineStorageKeys.read(index));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			
@@ -62,8 +61,8 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	}
 
 	private void addElement(IDatabaseElement<Key, Value> element) {
-		lineStorageKeys.appendLine(element.getKey().parseObjectToString());
-		lineStorageValues.appendLine(element.getValue().parseObjectToString());
+		lineStorageKeys.appendLine(keyFactory.createString(element.getKey()));
+		lineStorageValues.appendLine(valueFactory.createString(element.getValue()));
 	}
 	
 	@Override

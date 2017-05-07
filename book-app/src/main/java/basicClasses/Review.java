@@ -1,34 +1,29 @@
 package basicClasses;
 
-import databaseInterfaces.IStringable;
+public class Review {
 
-public class Review implements IStringable {
-	private ID id;
+	private final static String REVIEW_SPLITER = " ";
+	
+	private String id;
 	private Integer score;
 	
-	public final static String REVIEW_SPLITER = " ";
-	
-	public Review(ID id, Integer score) {
-		this.id = id;
-		this.score = score;
+	public Review (String review) {
+		String[] reviewArray = review.split(REVIEW_SPLITER);
+		
+		this.id = reviewArray[0];
+		this.score = Integer.valueOf(reviewArray[1]);
 	}
 	
-	public Review(String id, String score) {
-		this.id = new ID(id);
+	public Review (String id, String score) {
+		this.id = id;
 		this.score = Integer.valueOf(score);
 	}
-			
-	public static Review parseReviewFromString(String s) {
-		String[]  review = s.split(REVIEW_SPLITER);
-		
-		return new Review(review[0], review[1]);
-	}
 	
-	public ID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(ID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -40,13 +35,12 @@ public class Review implements IStringable {
 		this.score = score;
 	}
 
-	@Override
-	public String parseObjectToString() {
-		return id.parseObjectToString() + REVIEW_SPLITER + Double.toString(score);
+	public Review(String id, Integer score) {
+		this.id = id;
+		this.score = score;
 	}
 	
-	@Override
-	public IStringable parseObjectFromString(String s) {
-		return parseReviewFromString(s);
+	public String parseReviewToString() {
+		return id + REVIEW_SPLITER + score.toString();
 	}
 }

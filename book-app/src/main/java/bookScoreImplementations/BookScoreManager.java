@@ -12,12 +12,11 @@ import java.util.stream.Collectors;
 import com.google.inject.Inject;
 
 import basicClasses.Book;
-import basicClasses.ID;
 import basicClasses.Review;
 import basicClasses.Reviewer;
 import basicClassesFactory.BookFactory;
-import basicClassesFactory.IDFactory;
 import basicClassesFactory.ReviewerFactory;
+import basicClassesFactory.StringFactory;
 import databaseImplementations.Database;
 import databaseImplementations.MapBasedStorageFactory;
 import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
@@ -28,16 +27,16 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
 	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
 	
-	Database<ID, Reviewer> reviewersDatabase;
-	Database<ID, Book> booksDatabase;
+	Database<String, Reviewer> reviewersDatabase;
+	Database<String, Book> booksDatabase;
 	
 	@Inject
 	private List<Book> createListOfBooks(List<Reviewer> reviewers)
 	{
-	  	Map<ID, Book> booksMap = new HashMap<ID, Book>();
+	  	Map<String, Book> booksMap = new HashMap<String, Book>();
 		
 	  	reviewers.stream().forEach(r -> {
-	  		for(Review review : r.getReviewsList()) {
+	  		for(Review review : r.getReviewslist()) {
 	  			Review bookReview = new Review(r.getKey(), review.getScore());
 	  			Book updateBook = booksMap.containsKey(bookReview.getId()) ? 
 	  					booksMap.get(review.getId()) : new Book(review.getId());
@@ -53,7 +52,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
 	private List<Reviewer> removeReviewersDuplicates(List<Reviewer> reviewers)
 	{
-	  	Map<ID, Boolean> seen = new HashMap<ID, Boolean>();
+	  	Map<String, Boolean> seen = new HashMap<String, Boolean>();
 		
 	  	if (reviewers.isEmpty()) {
 	  		/* stream dosen't handle empty array well */
@@ -86,8 +85,8 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		books = createListOfBooks(reviewers);
 		
 		//TODO use injection
-		reviewersDatabase = new Database<ID, Reviewer>(new MapBasedStorageFactory(), new IDFactory(), new ReviewerFactory(), REVIEWERS_DATA_BASE_NAME);
-		booksDatabase = new Database<ID, Book>(new MapBasedStorageFactory(), new IDFactory(), new BookFactory(), BOOKS_DATA_BASE_NAME);
+		reviewersDatabase = new Database<String, Reviewer>(new MapBasedStorageFactory(), new StringFactory(), new ReviewerFactory(), REVIEWERS_DATA_BASE_NAME);
+		booksDatabase = new Database<String, Book>(new MapBasedStorageFactory(), new StringFactory(), new BookFactory(), BOOKS_DATA_BASE_NAME);
 		
 		reviewersDatabase.add(reviewers);
 		booksDatabase.add(books);
@@ -97,30 +96,30 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 
 	@Override
 	public boolean gaveReview(String reviewerId, String bookId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(new ID(reviewerId));
+		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
 		List<Review> reviewList;
 		
 		if (!reviewer.isPresent()) {
 			return false;
 		}
 		
-		reviewList = reviewer.get().getReviewsList();
+		reviewList = reviewer.get().getReviewslist();
 		
-		return reviewList.stream().anyMatch(r -> r.getId() == new ID(bookId));
+		return reviewList.stream().anyMatch(r -> r.getId().equals(bookId));
 	}
 
 	@Override
 	public OptionalDouble getScore(String reviewerId, String bookId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(new ID(reviewerId));
+		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
 		
 		if (!reviewer.isPresent()) {
 			/* No such reviewer */
 			return OptionalDouble.empty();
 		}
 				
-		Optional<Review> review = reviewer.get().getReviewsList()
+		Optional<Review> review = reviewer.get().getReviewslist()
 				.stream()
-				.filter(r -> r.getId() == new ID(bookId))
+				.filter(r -> r.getId().equals(bookId))
 				.findAny();
 		
 		if (!review.isPresent()) {
@@ -133,7 +132,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 
 	@Override
 	public List<String> getReviewedBooks(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(new ID(reviewerId));
+		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
 		List<String> booksIDs = new ArrayList<String>();
 
 		if (!reviewer.isPresent()) {
@@ -141,16 +140,16 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return booksIDs;
 		}
 		
-		reviewer.get().getReviewsList()
+		reviewer.get().getReviewslist()
 					.stream()
-					.forEach( r-> booksIDs.add(r.getId().parseObjectToString()));
+					.forEach( r-> booksIDs.add(r.getId()));
 		
 		return booksIDs;
 	}
 
 	@Override
 	public Map<String, Integer> getAllReviewsByReviewer(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(new ID(reviewerId));
+		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
 		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
 
 		if (!reviewer.isPresent()) {
@@ -158,16 +157,16 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return reviewsMap;
 		}
 		
-		reviewer.get().getReviewsList()
+		reviewer.get().getReviewslist()
 		.stream()
-		.forEach( r-> reviewsMap.put(r.getId().parseObjectToString(), r.getScore()));
+		.forEach( r-> reviewsMap.put(r.getId(), r.getScore()));
 
 		return reviewsMap;
 	}
 
 	@Override
 	public OptionalDouble getScoreAverageForReviewer(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(new ID(reviewerId));
+		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
 		Double average = new Double(0);
 		
 		if (!reviewer.isPresent()) {
@@ -175,14 +174,14 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return OptionalDouble.empty();
 		}
 		
-		if (!reviewer.get().getReviewsList().isEmpty()) {
+		if (!reviewer.get().getReviewslist().isEmpty()) {
 			Integer sum = reviewer.get()
-								 .getReviewsList()
+								 .getReviewslist()
 								 .stream()
 								 .mapToInt(r-> r.getScore())
 								 .sum();
 			
-			average = (double) sum / reviewer.get().getReviewsList().size();
+			average = (double) sum / reviewer.get().getReviewslist().size();
 		}
 		
 		return OptionalDouble.of(average);
@@ -190,7 +189,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 
 	@Override
 	public List<String> getReviewers(String bookId) {
-		Optional<Book> book = booksDatabase.findElementByID(new ID(bookId));
+		Optional<Book> book = booksDatabase.findElementByID(bookId);
 		List<String> reviewers = new ArrayList<String>();
 		
 		if (!book.isPresent()) {
@@ -198,16 +197,16 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return reviewers;
 		}
 		
-		book.get().getReviewsList()
+		book.get().getReviewslist()
 		.stream()
-		.forEach( r-> reviewers.add(r.getId().parseObjectToString()));
+		.forEach( r-> reviewers.add(r.getId()));
 		
 		return reviewers;
 	}
 
 	@Override
 	public Map<String, Integer> getReviewsForBook(String reviewerId) {
-		Optional<Book> book = booksDatabase.findElementByID(new ID(reviewerId));
+		Optional<Book> book = booksDatabase.findElementByID(reviewerId);
 		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
 
 		if (!book.isPresent()) {
@@ -215,16 +214,16 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return reviewsMap;
 		}
 		
-		book.get().getReviewsList()
+		book.get().getReviewslist()
 		.stream()
-		.forEach( r-> reviewsMap.put(r.getId().parseObjectToString(), r.getScore()));
+		.forEach( r-> reviewsMap.put(r.getId(), r.getScore()));
 
 		return reviewsMap;
 	}
 
 	@Override
 	public OptionalDouble getAverageReviewScoreForBook(String bookId) {
-		Optional<Book> book = booksDatabase.findElementByID(new ID(bookId));
+		Optional<Book> book = booksDatabase.findElementByID(bookId);
 		Double average = new Double(0);
 		
 		if (!book.isPresent()) {
@@ -232,14 +231,14 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return OptionalDouble.empty();
 		}
 		
-		if (!book.get().getReviewsList().isEmpty()) {
+		if (!book.get().getReviewslist().isEmpty()) {
 			Integer sum = book.get()
-							  .getReviewsList()
+							  .getReviewslist()
 							  .stream()
 						  	  .mapToInt(r-> r.getScore())
 							  .sum();
 			
-			average = (double) sum / book.get().getReviewsList().size();
+			average = (double) sum / book.get().getReviewslist().size();
 		}
 		
 		return OptionalDouble.of(average);

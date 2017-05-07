@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author Aviad
  *
  */
-public interface IDatabase<Key extends Comparable<Key> & IStringable, Value extends IStringable> {	
+public interface IDatabase<Key extends Comparable<Key>, Value> {	
 	/**
 	 * Returns the number of elements in database
 	 * 

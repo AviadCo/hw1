@@ -6,7 +6,7 @@ package databaseInterfaces;
  * @author Aviad
  *
  */
-public interface IDatabaseElement<Key extends Comparable<Key> & IStringable, Value extends IStringable> {
+public interface IDatabaseElement<Key extends Comparable<Key>, Value> {
 	Key getKey();
 	
 	Value getValue();
