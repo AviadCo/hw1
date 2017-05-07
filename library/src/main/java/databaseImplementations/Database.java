@@ -23,7 +23,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	private final String VALUES = "Values";
 	
 	@Inject
-	Database(LineStorageFactory lineStorageFactory, IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory, String databaseName) {
+	public Database(LineStorageFactory lineStorageFactory, IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory, String databaseName) {
 		this.lineStorageKeys = lineStorageFactory.open(databaseName + KEYS);
 		this.lineStorageValues = lineStorageFactory.open(databaseName + VALUES);
 		this.keyFactory = keyFactory;
@@ -61,7 +61,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 		}
 	}
 
-	private void add(IDatabaseElement<Key, Value> element) {
+	private void addElement(IDatabaseElement<Key, Value> element) {
 		lineStorageKeys.appendLine(element.getKey().parseObjectToString());
 		lineStorageValues.appendLine(element.getValue().parseObjectToString());
 	}
@@ -70,7 +70,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	public void add(List<IDatabaseElement<Key, Value>> elements) {
 		elements.stream()
 		.sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
-				.forEach(e -> add(e));
+				.forEach(e -> addElement(e));
 	}
 
 	@Override

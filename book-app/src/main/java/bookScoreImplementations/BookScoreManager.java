@@ -8,15 +8,32 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 import basicClasses.Book;
 import basicClasses.ID;
 import basicClasses.Review;
 import basicClasses.Reviewer;
+import basicClassesFactory.BookFactory;
+import basicClassesFactory.IDFactory;
+import basicClassesFactory.ReviewerFactory;
+import databaseImplementations.Database;
+import databaseImplementations.MapBasedStorageFactory;
+import databaseInterfaces.IDatabaseElement;
+import databaseInterfaces.IStringableFactory;
 import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
 import il.ac.technion.cs.sd.book.app.BookScoreReader;
+import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
+import il.ac.technion.cs.sd.book.ext.LineStorageModule;
 
 public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
+	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
+	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
+	
+	@Inject
 	private List<Book> createListOfBooks(List<Reviewer> reviewers)
 	{
 	  	Map<ID, Book> booksMap = new HashMap<ID, Book>();
@@ -69,6 +86,11 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		reviewers = removeReviewersDuplicates(reviewers);
 		
 		books = createListOfBooks(reviewers);
+		
+		//TODO use injection
+		Database<ID, Reviewer> booksDatabase = new Database<ID, Reviewer>(new MapBasedStorageFactory(), new IDFactory(), new ReviewerFactory(), REVIEWERS_DATA_BASE_NAME);
+		
+		booksDatabase.add(reviewers);
 		
 		System.out.print("Finished");
 	}

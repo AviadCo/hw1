@@ -14,6 +14,11 @@ public class Book implements IDatabaseElement<ID, Book >, IStringable {
 
 	public final static String REVIEWER_SPLITER = ",";
 	
+	public Book (String id) {
+		this.id = new ID(id);
+		this.reviewslist = new ArrayList<>();
+	}
+	
 	public Book (ID id) {
 		this.id = id;
 		this.reviewslist = new ArrayList<>();
