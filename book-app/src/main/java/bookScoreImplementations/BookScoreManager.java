@@ -18,14 +18,18 @@ import basicClassesFactory.BookFactory;
 import basicClassesFactory.ReviewerFactory;
 import basicClassesFactory.StringFactory;
 import databaseImplementations.Database;
-import databaseImplementations.MapBasedStorageFactory;
 import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
 import il.ac.technion.cs.sd.book.app.BookScoreReader;
+import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
 
 public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
+	@Inject LineStorageFactory lineStorageFactory;
+	
 	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
 	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
+	private static final String KEYS = "KEYS";
+	private static final String VALUES = "VALUES";
 	
 	Database<String, Reviewer> reviewersDatabase;
 	Database<String, Book> booksDatabase;
@@ -84,9 +88,14 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		
 		books = createListOfBooks(reviewers);
 		
-		//TODO use injection
-		reviewersDatabase = new Database<String, Reviewer>(new MapBasedStorageFactory(), new StringFactory(), new ReviewerFactory(), REVIEWERS_DATA_BASE_NAME);
-		booksDatabase = new Database<String, Book>(new MapBasedStorageFactory(), new StringFactory(), new BookFactory(), BOOKS_DATA_BASE_NAME);
+		lineStorageFactory.open(BOOKS_DATA_BASE_NAME + KEYS);
+		
+		reviewersDatabase = new Database<String, Reviewer>(lineStorageFactory.open(REVIEWERS_DATA_BASE_NAME + KEYS), 
+				   										   lineStorageFactory.open(REVIEWERS_DATA_BASE_NAME + VALUES),
+				   										   new StringFactory(), new ReviewerFactory(), REVIEWERS_DATA_BASE_NAME);
+		booksDatabase = new Database<String, Book>(lineStorageFactory.open(BOOKS_DATA_BASE_NAME + KEYS), 
+												   lineStorageFactory.open(BOOKS_DATA_BASE_NAME + VALUES),
+												   new StringFactory(), new BookFactory(), BOOKS_DATA_BASE_NAME);
 		
 		reviewersDatabase.add(reviewers);
 		booksDatabase.add(books);

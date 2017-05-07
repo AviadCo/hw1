@@ -9,7 +9,6 @@ import databaseInterfaces.IDatabase;
 import databaseInterfaces.IDatabaseElement;
 import databaseInterfaces.IStringableFactory;
 import il.ac.technion.cs.sd.book.ext.LineStorage;
-import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
 
 public class Database<Key extends Comparable<Key>, Value> implements IDatabase<Key, Value> {
 
@@ -18,13 +17,12 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 	IStringableFactory<Key> keyFactory;
 	IStringableFactory<Value> valueFactory;
 	
-	private final String KEYS = "Keys";
-	private final String VALUES = "Values";
-	
 	@Inject
-	public Database(LineStorageFactory lineStorageFactory, IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory, String databaseName) {
-		this.lineStorageKeys = lineStorageFactory.open(databaseName + KEYS);
-		this.lineStorageValues = lineStorageFactory.open(databaseName + VALUES);
+	public Database(LineStorage lineStorageKeys, LineStorage lineStorageValues,
+					IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory,
+					String databaseName) {
+		this.lineStorageKeys = lineStorageKeys;
+		this.lineStorageValues = lineStorageValues;
 		this.keyFactory = keyFactory;
 		this.valueFactory = valueFactory;
 	}
