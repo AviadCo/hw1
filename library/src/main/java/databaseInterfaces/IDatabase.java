@@ -25,7 +25,7 @@ public interface IDatabase<Key extends Comparable<Key> & IStringable, Value exte
 	 * 
 	 * @param students - list of elements to add
 	 */
-	void add(List<IDatabaseElement<Key, Value>> elements);
+	void add(List<? extends IDatabaseElement<Key, Value>> elements);
 
 	/**
 	 * findStudentByID - returns element by it's key using binary search algorithm.

@@ -67,7 +67,7 @@ public class Database<Key extends Comparable<Key> & IStringable, Value extends I
 	}
 	
 	@Override
-	public void add(List<IDatabaseElement<Key, Value>> elements) {
+	public void add(List<? extends IDatabaseElement<Key, Value>> elements) {
 		elements.stream()
 		.sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
 				.forEach(e -> addElement(e));
