@@ -27,7 +27,8 @@ class BookScoreModule extends AbstractModule {
   }
   
   @Provides
-  @Singleton Database<String, DatabaseElement> createReviewerDatabase(String databaseName) {
+  @Singleton Database<String, DatabaseElement> createrDatabase(String databaseName) {
+	  //TODO bind LineStorageFactory to MapBasedStorageFactory the right way
 	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
 
 	  return new Database<String, DatabaseElement>(lineStorageFactory.open(databaseName + KEYS),

@@ -5,16 +5,31 @@ import java.util.List;
 
 import databaseInterfaces.IDatabaseElement;
 
+/**
+ * This class implements IDatabaseElement interface.
+ * The DatabaseElement is match to reviewer and book structures
+ * 
+ * @author Aviad
+ *
+ */
 public class DatabaseElement implements IDatabaseElement<String, DatabaseElement> {
 
 	private String id;
 	private List<Review> reviewslist;
 	
+	/**
+	 * @param id - id of the element
+	 */
 	public DatabaseElement (String id) {
 		this.id = id;
 		this.reviewslist = new ArrayList<>();
 	}
-		
+	
+	/**
+	 * 
+	 * @param id - id of the element
+	 * @param reviewslist - list of reviews which belongs to element
+	 */
 	public DatabaseElement (String id, List<Review> reviewslist) {
 		this.id = id;
 		this.reviewslist = reviewslist;
@@ -46,7 +61,11 @@ public class DatabaseElement implements IDatabaseElement<String, DatabaseElement
 		return this;
 	}
 
-	public void addReview(Review bookReview) {
-		reviewslist.add(bookReview);
+	/**
+	 * 
+	 * @param review - review to add to the element list
+	 */
+	public void addReview(Review review) {
+		reviewslist.add(review);
 	}
 }

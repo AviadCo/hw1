@@ -10,6 +10,15 @@ import databaseInterfaces.IDatabaseElement;
 import databaseInterfaces.IStringableFactory;
 import il.ac.technion.cs.sd.book.ext.LineStorage;
 
+/**
+ * This class represents a database implementation.
+ * The elements in the database msut consist of Key and Value pair. 
+ * 
+ * @author Aviad
+ *
+ * @param <Key> - The type of element key
+ * @param <Value> - The type of element value.
+ */
 public class Database<Key extends Comparable<Key>, Value> implements IDatabase<Key, Value> {
 
 	LineStorage lineStorageKeys;
@@ -17,6 +26,13 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 	IStringableFactory<Key> keyFactory;
 	IStringableFactory<Value> valueFactory;
 	
+	/**
+	 * 
+	 * @param lineStorageKeys - lineStorage to store the keys
+	 * @param lineStorageValues - lineStorage to store the values
+	 * @param keyFactory - factory to create key from string
+	 * @param valueFactory - factory to create value from string
+	 */
 	@Inject
 	public Database(LineStorage lineStorageKeys, LineStorage lineStorageValues,
 					IStringableFactory<Key> keyFactory, IStringableFactory<Value> valueFactory) {
@@ -26,6 +42,11 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 		this.valueFactory = valueFactory;
 	}
 	
+	/**
+	 * 
+	 * @param index - line index of the value
+	 * @return - Value that is stored in the row index
+	 */
 	private Value getValueByIndex(int index) {
 		try {
 			return valueFactory.createObject(lineStorageValues.read(index));
@@ -36,6 +57,11 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 		}
 	}
 	
+	/**
+	 * 
+	 * @param index - line index of the key 
+	 * @return - key that is stored in the row index
+	 */
 	private Key getKeyByIndex(int index) {
 		try {
 			return keyFactory.createObject(lineStorageKeys.read(index));
@@ -46,6 +72,9 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 		}
 	}
 	
+	/**
+	 * @return - number of elements in database
+	 */
 	@Override
 	public Integer getNumberOfElements() {
 		try {
@@ -57,11 +86,18 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 		}
 	}
 
+	/**
+	 * 
+	 * @param element - add one element to the lineStorage
+	 */
 	private void addElement(IDatabaseElement<Key, Value> element) {
 		lineStorageKeys.appendLine(keyFactory.createString(element.getKey()));
 		lineStorageValues.appendLine(valueFactory.createString(element.getValue()));
 	}
 	
+	/**
+	 * @param - list of elements to add at once.
+	 */
 	@Override
 	public void add(List<? extends IDatabaseElement<Key, Value>> elements) {
 		elements.stream()
@@ -69,6 +105,10 @@ public class Database<Key extends Comparable<Key>, Value> implements IDatabase<K
 				.forEach(e -> addElement(e));
 	}
 
+	/**
+	 * @param - key of the wanted element
+	 * @return - if key exists,  Optional<Value> of the element. else, Optionl.empty().
+	 */
 	@Override
 	public Optional<Value> findElementByID(Key key) {
 		Integer numberOfLines = getNumberOfElements();

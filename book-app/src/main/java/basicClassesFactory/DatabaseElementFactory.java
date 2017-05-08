@@ -8,6 +8,13 @@ import basicClasses.DatabaseElement;
 import basicClasses.Review;
 import databaseInterfaces.IStringableFactory;
 
+/**
+ * This class is Factory for DatabaseElement.
+ * The class implements IStringableFactory factory
+ * 
+ * @author Aviad
+ *
+ */
 public class DatabaseElementFactory implements IStringableFactory<DatabaseElement> {
 
 	private final static String ELEMENT_SPLITER = ",";

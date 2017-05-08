@@ -5,6 +5,13 @@ import java.util.Map;
 
 import il.ac.technion.cs.sd.book.ext.LineStorage;
 
+/**
+ * This class implements LineStorage to store objects.
+ * The MapBasedStorage isn't persistent (just for testing).
+ * 
+ * @author Aviad
+ *
+ */
 public class MapBasedStorage implements LineStorage {
 
 	private Map<Integer, String> mapStorage;

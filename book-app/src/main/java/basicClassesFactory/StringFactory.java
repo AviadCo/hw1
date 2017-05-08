@@ -2,6 +2,13 @@ package basicClassesFactory;
 
 import databaseInterfaces.IStringableFactory;
 
+/**
+ * This class is a factory for String elements.
+ * The class implements IStringableFactory factory
+ * 
+ * @author Aviad
+ *
+ */
 public class StringFactory implements IStringableFactory<String> {
 
 	@Override

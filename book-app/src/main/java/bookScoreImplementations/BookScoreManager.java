@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 
@@ -18,6 +17,12 @@ import databaseImplementations.Database;
 import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
 import il.ac.technion.cs.sd.book.app.BookScoreReader;
 
+/**
+ * This class implements BookScoreInitializer & BookScoreReader using LineStorageFactory
+ * 
+ * @author Aviad
+ *
+ */
 public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
 	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
@@ -30,6 +35,11 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param reviewers - get list of reviewers from parser
+	 * @return - list of books. each book has id and list of reviews
+	 */
 	private List<DatabaseElement> createListOfBooks(List<DatabaseElement> reviewers)
 	{
 	  	Map<String, DatabaseElement> booksMap = new HashMap<String, DatabaseElement>();
@@ -49,23 +59,9 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	  	return new ArrayList<DatabaseElement>(booksMap.values());
 	}
 	
-	private List<DatabaseElement> removeReviewersDuplicates(List<DatabaseElement> reviewers)
-	{
-	  	Map<String, Boolean> seen = new HashMap<String, Boolean>();
-		
-	  	if (reviewers.isEmpty()) {
-	  		/* stream dosen't handle empty array well */
-	  		return reviewers;
-	  	}
-	  	
-	  	List <DatabaseElement> reversedReviewers = reviewers.subList(0, reviewers.size());
-		Collections.reverse(reversedReviewers);
-		
-		return reversedReviewers.stream()
-				   .filter(r -> seen.putIfAbsent(r.getKey(), Boolean.TRUE) == null)
-			       .collect(Collectors.toList());
-	}
-	
+	/**
+	 * Gets xmlData of Reviewer with reviewer, parse it and initialize LineStorage database.
+	 */
 	@Override
 	public void setup(String XmlData) {
 		List<DatabaseElement> books;
@@ -78,15 +74,11 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			
 			throw new RuntimeException();
 		}
-		
-		reviewers = removeReviewersDuplicates(reviewers);
-		
+				
 		books = createListOfBooks(reviewers);
 						
 		reviewersDatabase.add(reviewers);
 		booksDatabase.add(books);
-		
-		System.out.print("Finished");
 	}
 	
 	private OptionalInt getScore(String reviewerId, String bookId, Database<String, DatabaseElement> database)

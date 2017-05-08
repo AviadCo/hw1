@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This is interface represent Storage for elements.
+ * This is interface represent database storage for elements.
  * The elements must implement IDatabaseElement interface.
  * 
  * @author Aviad
@@ -12,8 +12,6 @@ import java.util.Optional;
  */
 public interface IDatabase<Key extends Comparable<Key>, Value> {	
 	/**
-	 * Returns the number of elements in database
-	 * 
 	 * @return - number of elements in database
 	 */
 	Integer getNumberOfElements();
@@ -23,7 +21,7 @@ public interface IDatabase<Key extends Comparable<Key>, Value> {
 	 * 
 	 * Do not add multiple elements more than once since the database sorting won't be maintained
 	 * 
-	 * @param students - list of elements to add
+	 * @param elements - list of elements to add
 	 */
 	void add(List<? extends IDatabaseElement<Key, Value>> elements);
 
