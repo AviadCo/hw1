@@ -7,39 +7,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 
-import basicClasses.Book;
+import basicClasses.DatabaseElement;
 import basicClasses.Review;
-import basicClasses.Reviewer;
 import databaseImplementations.Database;
 import il.ac.technion.cs.sd.book.app.BookScoreInitializer;
 import il.ac.technion.cs.sd.book.app.BookScoreReader;
 
 public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
-	@Inject Database<String, Reviewer> reviewersDatabase = createReviewerDatabase();
-	@Inject Database<String, Book> booksDatabase = createBookDatabase();
+	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
+	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
 	
-	public Database<String, Book> createBookDatabase() {
+	@Inject Database<String, DatabaseElement> reviewersDatabase = createDatabase(REVIEWERS_DATA_BASE_NAME);
+	@Inject Database<String, DatabaseElement> booksDatabase = createDatabase(BOOKS_DATA_BASE_NAME);
+	
+	public Database<String, DatabaseElement> createDatabase(String databaseName) {
 		return null;
 	}
 	
-	public Database<String, Reviewer> createReviewerDatabase() {
-		return null;
-	}
-	
-	private List<Book> createListOfBooks(List<Reviewer> reviewers)
+	private List<DatabaseElement> createListOfBooks(List<DatabaseElement> reviewers)
 	{
-	  	Map<String, Book> booksMap = new HashMap<String, Book>();
+	  	Map<String, DatabaseElement> booksMap = new HashMap<String, DatabaseElement>();
 		
 	  	reviewers.stream().forEach(r -> {
 	  		for(Review review : r.getReviewslist()) {
 	  			Review bookReview = new Review(r.getKey(), review.getScore());
-	  			Book updateBook = booksMap.containsKey(bookReview.getId()) ? 
-	  					booksMap.get(review.getId()) : new Book(review.getId());
+	  			DatabaseElement updateBook = booksMap.containsKey(bookReview.getId()) ? 
+	  					booksMap.get(review.getId()) : new DatabaseElement(review.getId());
 	  					
 	  			updateBook.addReview(bookReview);
 	  					
@@ -47,10 +46,10 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	  		}
 	  	});
 	  	
-	  	return new ArrayList<Book>(booksMap.values());
+	  	return new ArrayList<DatabaseElement>(booksMap.values());
 	}
 	
-	private List<Reviewer> removeReviewersDuplicates(List<Reviewer> reviewers)
+	private List<DatabaseElement> removeReviewersDuplicates(List<DatabaseElement> reviewers)
 	{
 	  	Map<String, Boolean> seen = new HashMap<String, Boolean>();
 		
@@ -59,7 +58,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	  		return reviewers;
 	  	}
 	  	
-	  	List <Reviewer> reversedReviewers = reviewers.subList(0, reviewers.size());
+	  	List <DatabaseElement> reversedReviewers = reviewers.subList(0, reviewers.size());
 		Collections.reverse(reversedReviewers);
 		
 		return reversedReviewers.stream()
@@ -69,8 +68,8 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
 	@Override
 	public void setup(String XmlData) {
-		List<Book> books;
-		List<Reviewer> reviewers;
+		List<DatabaseElement> books;
+		List<DatabaseElement> reviewers;
 		
 		try {
 			reviewers = BookScoreParser.createListOfReviewers(XmlData);
@@ -89,158 +88,115 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		
 		System.out.print("Finished");
 	}
-
-	@Override
-	public boolean gaveReview(String reviewerId, String bookId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
-		List<Review> reviewList;
+	
+	private OptionalInt getScore(String reviewerId, String bookId, Database<String, DatabaseElement> database)
+	{
+		Optional<DatabaseElement> element = database.findElementByID(reviewerId);
 		
-		if (!reviewer.isPresent()) {
-			return false;
-		}
-		
-		reviewList = reviewer.get().getReviewslist();
-		
-		return reviewList.stream().anyMatch(r -> r.getId().equals(bookId));
-	}
-
-	@Override
-	public OptionalDouble getScore(String reviewerId, String bookId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
-		
-		if (!reviewer.isPresent()) {
-			/* No such reviewer */
-			return OptionalDouble.empty();
+		if (!element.isPresent()) {
+			/* No such element */
+			return OptionalInt.empty();
 		}
 				
-		Optional<Review> review = reviewer.get().getReviewslist()
+		Optional<Review> review = element.get().getReviewslist()
 				.stream()
 				.filter(r -> r.getId().equals(bookId))
 				.findAny();
 		
 		if (!review.isPresent()) {
 			/* The reviewer didn't give review on the given book */
+			return OptionalInt.empty();
+		}
+		
+		return OptionalInt.of(review.get().getScore());
+	}
+	
+	private Map<String, Integer> getAllReviewsOfElement(String elementId, Database<String, DatabaseElement> database) {
+		Optional<DatabaseElement> element = database.findElementByID(elementId);
+		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
+
+		if (!element.isPresent()) {
+			/* No such element */
+			return reviewsMap;
+		}
+		
+		element.get()
+				.getReviewslist()
+				.stream()
+				.forEach( r-> reviewsMap.put(r.getId(), r.getScore()));
+
+		return reviewsMap;
+	}
+	
+	private OptionalDouble getAverageReviewsOfElement(String elementId, Database<String, DatabaseElement> database) {
+		Optional<DatabaseElement> element = database.findElementByID(elementId);
+		
+		if (!element.isPresent()) {
+			/* No such element */
 			return OptionalDouble.empty();
 		}
 		
-		return OptionalDouble.of(review.get().getScore());
+		Integer sum = getReviewsForBook(elementId)
+										.values()
+										.stream()
+										.mapToInt(score -> score)
+										.sum();
+				
+		return OptionalDouble.of((double) sum / element.get().getReviewslist().size());
+	}
+	
+	private List<String> getElementList(String elementId, Database<String, DatabaseElement> database) {
+		List<String> elementList = new ArrayList<String>();
+		
+		elementList.addAll(getAllReviewsOfElement(elementId, database).keySet());
+		Collections.sort(elementList);
+		
+		return elementList;
+	}
+	
+	@Override
+	public boolean gaveReview(String reviewerId, String bookId) {
+		return getScore(reviewerId, bookId) != OptionalDouble.empty();
+	}
+
+	@Override
+	public OptionalDouble getScore(String reviewerId, String bookId) {
+		OptionalInt score = getScore(reviewerId, bookId, reviewersDatabase);
+		
+		if (!score.isPresent()) {
+			return OptionalDouble.empty();
+		}
+				
+		return OptionalDouble.of(score.getAsInt());
 	}
 
 	@Override
 	public List<String> getReviewedBooks(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
-		List<String> booksIDs = new ArrayList<String>();
-
-		if (!reviewer.isPresent()) {
-			/* No such reviewer */
-			return booksIDs;
-		}
-		
-		reviewer.get().getReviewslist()
-					.stream()
-					.forEach( r-> booksIDs.add(r.getId()));
-		
-		//TODO the test check in order
-		Collections.sort(booksIDs);
-		
-		return booksIDs;
+		return getElementList(reviewerId, reviewersDatabase);
 	}
 
 	@Override
 	public Map<String, Integer> getAllReviewsByReviewer(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
-		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
-
-		if (!reviewer.isPresent()) {
-			/* No such reviewer */
-			return reviewsMap;
-		}
-		
-		reviewer.get().getReviewslist()
-		.stream()
-		.forEach( r-> reviewsMap.put(r.getId(), r.getScore()));
-
-		return reviewsMap;
+		return getAllReviewsOfElement(reviewerId, reviewersDatabase);
 	}
 
 	@Override
 	public OptionalDouble getScoreAverageForReviewer(String reviewerId) {
-		Optional<Reviewer> reviewer = reviewersDatabase.findElementByID(reviewerId);
-		Double average = new Double(0);
-		
-		if (!reviewer.isPresent()) {
-			/* No such reviewer */
-			return OptionalDouble.empty();
-		}
-		
-		if (!reviewer.get().getReviewslist().isEmpty()) {
-			Integer sum = reviewer.get()
-								 .getReviewslist()
-								 .stream()
-								 .mapToInt(r-> r.getScore())
-								 .sum();
-			
-			average = (double) sum / reviewer.get().getReviewslist().size();
-		}
-		
-		return OptionalDouble.of(average);
+		return getAverageReviewsOfElement(reviewerId, reviewersDatabase);
 	}
 
 	@Override
 	public List<String> getReviewers(String bookId) {
-		Optional<Book> book = booksDatabase.findElementByID(bookId);
-		List<String> reviewers = new ArrayList<String>();
-		
-		if (!book.isPresent()) {
-			/* No such reviewer */
-			return reviewers;
-		}
-		
-		book.get().getReviewslist()
-		.stream()
-		.forEach( r-> reviewers.add(r.getId()));
-		
-		return reviewers;
+		return getElementList(bookId, booksDatabase);
 	}
 
 	@Override
 	public Map<String, Integer> getReviewsForBook(String reviewerId) {
-		Optional<Book> book = booksDatabase.findElementByID(reviewerId);
-		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
-
-		if (!book.isPresent()) {
-			/* No such reviewer */
-			return reviewsMap;
-		}
-		
-		book.get().getReviewslist()
-		.stream()
-		.forEach( r-> reviewsMap.put(r.getId(), r.getScore()));
-
-		return reviewsMap;
+		return getAllReviewsOfElement(reviewerId, booksDatabase);
 	}
 
 	@Override
 	public OptionalDouble getAverageReviewScoreForBook(String bookId) {
-		Optional<Book> book = booksDatabase.findElementByID(bookId);
-		Double average = new Double(0);
-		
-		if (!book.isPresent()) {
-			/* No such reviewer */
-			return OptionalDouble.empty();
-		}
-		
-		if (!book.get().getReviewslist().isEmpty()) {
-			Integer sum = book.get()
-							  .getReviewslist()
-							  .stream()
-						  	  .mapToInt(r-> r.getScore())
-							  .sum();
-			
-			average = (double) sum / book.get().getReviewslist().size();
-		}
-		
-		return OptionalDouble.of(average);
+		return getAverageReviewsOfElement(bookId, booksDatabase);
 	}
-
 }

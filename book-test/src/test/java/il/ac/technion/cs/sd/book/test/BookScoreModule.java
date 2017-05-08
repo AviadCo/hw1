@@ -4,10 +4,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-import basicClasses.Book;
-import basicClasses.Reviewer;
-import basicClassesFactory.BookFactory;
-import basicClassesFactory.ReviewerFactory;
+import basicClasses.DatabaseElement;
+import basicClassesFactory.DatabaseElementFactory;
 import basicClassesFactory.StringFactory;
 import bookScoreImplementations.BookScoreManager;
 import databaseImplementations.Database;
@@ -19,8 +17,6 @@ import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
 // This module is in the testing project, so that it could easily bind all dependencies from all levels.
 class BookScoreModule extends AbstractModule {
 	
-	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
-	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
 	private static final String KEYS = "KEYS";
 	private static final String VALUES = "VALUES";
 
@@ -31,20 +27,11 @@ class BookScoreModule extends AbstractModule {
   }
   
   @Provides
-  @Singleton Database<String, Reviewer> createReviewerDatabase() {
+  @Singleton Database<String, DatabaseElement> createReviewerDatabase(String databaseName) {
 	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
 
-	  return new Database<String, Reviewer>(lineStorageFactory.open(REVIEWERS_DATA_BASE_NAME + KEYS),
-			  								lineStorageFactory.open(REVIEWERS_DATA_BASE_NAME + VALUES),
-				   						    new StringFactory(), new ReviewerFactory());
-  }
-  
-  @Provides
-  @Singleton Database<String, Book> createBookDatabase() {
-	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
-
-	  return new Database<String, Book>(lineStorageFactory.open(BOOKS_DATA_BASE_NAME + KEYS),
-			  							lineStorageFactory.open(BOOKS_DATA_BASE_NAME + VALUES),
-				   						new StringFactory(), new BookFactory());
+	  return new Database<String, DatabaseElement>(lineStorageFactory.open(databaseName + KEYS),
+			  									   lineStorageFactory.open(databaseName + VALUES),
+			  									   new StringFactory(), new DatabaseElementFactory());
   }
 }

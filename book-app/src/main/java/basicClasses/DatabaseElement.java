@@ -5,17 +5,17 @@ import java.util.List;
 
 import databaseInterfaces.IDatabaseElement;
 
-public class Book implements IDatabaseElement<String, Book > {
-			
+public class DatabaseElement implements IDatabaseElement<String, DatabaseElement> {
+
 	private String id;
 	private List<Review> reviewslist;
 	
-	public Book (String id) {
+	public DatabaseElement (String id) {
 		this.id = id;
 		this.reviewslist = new ArrayList<>();
 	}
 		
-	public Book (String id, List<Review> reviewslist) {
+	public DatabaseElement (String id, List<Review> reviewslist) {
 		this.id = id;
 		this.reviewslist = reviewslist;
 	}
@@ -42,7 +42,7 @@ public class Book implements IDatabaseElement<String, Book > {
 	}
 
 	@Override
-	public Book getValue() {
+	public DatabaseElement getValue() {
 		return this;
 	}
 

@@ -15,8 +15,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import basicClasses.DatabaseElement;
 import basicClasses.Review;
-import basicClasses.Reviewer;
 
 public class BookScoreParser {
 
@@ -28,9 +28,9 @@ public class BookScoreParser {
 	/*
 	 * Create Document Object out of String
 	 */
-	public static List<Reviewer> createListOfReviewers(String xml) throws Exception
+	public static List<DatabaseElement> createListOfReviewers(String xml) throws Exception
 	{
-		Map<String, Reviewer> reviewerMap = new HashMap<String, Reviewer> ();
+		Map<String, DatabaseElement> reviewerMap = new HashMap<String, DatabaseElement> ();
 		
 		Document doc = loadXMLFromString(xml);
 		
@@ -52,15 +52,15 @@ public class BookScoreParser {
             System.out.print(currentReviwerNode.getNodeName());
             
             if (currentReviwerNode.getNodeType() == Node.ELEMENT_NODE) {
-            	Reviewer currentReviewer = parseReviewerNode(currentReviwerNode);
+            	DatabaseElement currentReviewer = parseReviewerNode(currentReviwerNode);
             	
             	if (reviewerMap.containsKey(currentReviewer.getKey())) {
-            		Reviewer sameReviewer = reviewerMap.get(currentReviewer.getKey());
+            		DatabaseElement sameReviewer = reviewerMap.get(currentReviewer.getKey());
             		
             		List<Review> allReviewes = new ArrayList<>(sameReviewer.getReviewslist());
             		allReviewes.addAll(currentReviewer.getReviewslist());
             		
-            		reviewerMap.put(currentReviewer.getKey(), new Reviewer(currentReviewer.getKey(), allReviewes));
+            		reviewerMap.put(currentReviewer.getKey(), new DatabaseElement(currentReviewer.getKey(), allReviewes));
             	} else {
             		reviewerMap.put(currentReviewer.getKey(), currentReviewer);
             	}
@@ -102,9 +102,9 @@ public class BookScoreParser {
 	/*
 	 * Create Document Object out of String
 	 */
-	public static Reviewer parseReviewerNode(Node reviewerNode) throws Exception
+	public static DatabaseElement parseReviewerNode(Node reviewerNode) throws Exception
 	{
-		Reviewer reviewer;
+		DatabaseElement reviewer;
 		Element reviewerElement = (Element) reviewerNode;
 		
 		String reviewerID = reviewerElement.getAttribute(ID_TAG);
@@ -112,7 +112,7 @@ public class BookScoreParser {
         System.out.print("ID : ");
         System.out.println(reviewerID);
         
-        reviewer = new Reviewer(reviewerID);
+        reviewer = new DatabaseElement(reviewerID);
         
         NodeList reviewList = reviewerElement.getElementsByTagName(REVIEW_TAG);
         
@@ -126,5 +126,4 @@ public class BookScoreParser {
 	    
 	    return reviewer;
 	}
-	
 }
