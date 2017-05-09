@@ -30,7 +30,7 @@ public class BookScoreManagerTester {
 		/* Parsing example file */
 	    String fileContents = null;
 		try {
-			fileContents = new Scanner(new File((BookScoreManagerTester.class).getResource("exmapleTest.xml").getFile())).useDelimiter("\\Z").next();
+			fileContents = new Scanner(new File("src/test/resources/exmapleTest.xml")).useDelimiter("\\Z").next();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			Assert.fail();
