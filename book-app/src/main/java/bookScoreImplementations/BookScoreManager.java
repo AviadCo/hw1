@@ -34,7 +34,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
 	@Inject
 	public BookScoreManager(@Named(REVIEWERS_DATA_BASE_NAME) Database<String, DatabaseElement> reviewersDatabase,@Named(BOOKS_DATA_BASE_NAME) Database<String, DatabaseElement> booksDatabase) {
-		this.booksDatabase = reviewersDatabase;
+		this.booksDatabase = booksDatabase;
 		this.reviewersDatabase = reviewersDatabase;
 	}
 	
@@ -152,6 +152,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return OptionalDouble.empty();
 		}
 		
+		//TODO Aviad: did you mean element.get??
 		Integer sum = getReviewsForBook(elementId)
 										.values()
 										.stream()
