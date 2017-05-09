@@ -24,7 +24,7 @@ public class ExampleTest {
   private static BookScoreReader setupAndGetReader(String fileName) throws FileNotFoundException {
     String fileContents =
         new Scanner(new File(ExampleTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
-    Injector injector = Guice.createInjector(new BookScoreModule(), new LineStorageModule());
+    Injector injector = Guice.createInjector(new BookScoreModule()/*, new LineStorageModule()*/);
     injector.getInstance(BookScoreInitializer.class).setup(fileContents);
     return injector.getInstance(BookScoreReader.class);
   }

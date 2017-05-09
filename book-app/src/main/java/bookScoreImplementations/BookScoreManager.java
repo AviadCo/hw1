@@ -81,12 +81,19 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		booksDatabase.add(books);
 	}
 	
+	/**
+	 * 
+	 * @param reviewerId - the reviewer id of the review
+	 * @param bookId - the book id which was reviewed
+	 * @param database - on which database to search for the review
+	 * @return - if review exists, OptionalInt of the score from the review, else OptionalInt.empty()
+	 */
 	private OptionalInt getScore(String reviewerId, String bookId, Database<String, DatabaseElement> database)
 	{
 		Optional<DatabaseElement> element = database.findElementByID(reviewerId);
 		
 		if (!element.isPresent()) {
-			/* No such element */
+			/* No such reviewer */
 			return OptionalInt.empty();
 		}
 				
@@ -103,6 +110,12 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		return OptionalInt.of(review.get().getScore());
 	}
 	
+	/**
+	 * 
+	 * @param elementId - book id / reviewer id which the reviews belongs to.
+	 * @param database - the database of the element to search in
+	 * @return - Map of the reviews which belongs to book id / reviewer id.
+	 */
 	private Map<String, Integer> getAllReviewsOfElement(String elementId, Database<String, DatabaseElement> database) {
 		Optional<DatabaseElement> element = database.findElementByID(elementId);
 		Map<String, Integer> reviewsMap = new HashMap<String, Integer>();
@@ -120,6 +133,12 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		return reviewsMap;
 	}
 	
+	/**
+	 * 
+	 * @param elementId - book id / reviewer id which the reviews belongs to.
+	 * @param database - the database of the element to search in
+	 * @return if elementId exists, OptionalDouble of the average of the scores, else OptionalDouble.empty().
+	 */
 	private OptionalDouble getAverageReviewsOfElement(String elementId, Database<String, DatabaseElement> database) {
 		Optional<DatabaseElement> element = database.findElementByID(elementId);
 		
@@ -133,10 +152,17 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 										.stream()
 										.mapToInt(score -> score)
 										.sum();
-				
+		
+		/* if element exists, it must have at least one review in the reviews list */
 		return OptionalDouble.of((double) sum / element.get().getReviewslist().size());
 	}
 	
+	/**
+	 * 
+	 * @param elementId - book id / reviewer id which the reviews belongs to.
+	 * @param database - the database of the element to search in
+	 * @return - list of the ids which were in the element reviews
+	 */
 	private List<String> getElementList(String elementId, Database<String, DatabaseElement> database) {
 		List<String> elementList = new ArrayList<String>();
 		

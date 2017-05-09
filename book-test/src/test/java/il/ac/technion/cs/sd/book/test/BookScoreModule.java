@@ -24,13 +24,12 @@ class BookScoreModule extends AbstractModule {
   protected void configure() {
 	  bind(BookScoreInitializer.class).to(BookScoreManager.class);
 	  bind(BookScoreReader.class).to(BookScoreManager.class);
+	  //TODO remove this after testing
+	  bind(LineStorageFactory.class).to(MapBasedStorageFactory.class);
   }
   
   @Provides
-  @Singleton Database<String, DatabaseElement> createrDatabase(String databaseName) {
-	  //TODO bind LineStorageFactory to MapBasedStorageFactory the right way
-	  LineStorageFactory lineStorageFactory = new MapBasedStorageFactory();
-
+  @Singleton Database<String, DatabaseElement> createrDatabase(String databaseName, LineStorageFactory lineStorageFactory) {
 	  return new Database<String, DatabaseElement>(lineStorageFactory.open(databaseName + KEYS),
 			  									   lineStorageFactory.open(databaseName + VALUES),
 			  									   new StringFactory(), new DatabaseElementFactory());
