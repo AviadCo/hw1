@@ -10,6 +10,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import basicClasses.DatabaseElement;
 import basicClasses.Review;
@@ -25,11 +26,17 @@ import il.ac.technion.cs.sd.book.app.BookScoreReader;
  */
 public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	
-	private static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
-	private static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
+	public static final String BOOKS_DATA_BASE_NAME = "BOOKS_DATABASE";
+	public static final String REVIEWERS_DATA_BASE_NAME = "REVIEWERS_DATABASE";
 	
-	@Inject Database<String, DatabaseElement> reviewersDatabase = createDatabase(REVIEWERS_DATA_BASE_NAME);
-	@Inject Database<String, DatabaseElement> booksDatabase = createDatabase(BOOKS_DATA_BASE_NAME);
+	Database<String, DatabaseElement> reviewersDatabase;
+	Database<String, DatabaseElement> booksDatabase;
+	
+	@Inject
+	public BookScoreManager(@Named(REVIEWERS_DATA_BASE_NAME) Database<String, DatabaseElement> reviewersDatabase,@Named(BOOKS_DATA_BASE_NAME) Database<String, DatabaseElement> booksDatabase) {
+		this.booksDatabase = reviewersDatabase;
+		this.reviewersDatabase = reviewersDatabase;
+	}
 	
 	public Database<String, DatabaseElement> createDatabase(String databaseName) {
 		return null;
@@ -79,6 +86,8 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 						
 		reviewersDatabase.add(reviewers);
 		booksDatabase.add(books);
+		
+		return;
 	}
 	
 	/**

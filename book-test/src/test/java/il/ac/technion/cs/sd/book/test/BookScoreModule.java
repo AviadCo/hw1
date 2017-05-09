@@ -3,6 +3,7 @@ package il.ac.technion.cs.sd.book.test;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import basicClasses.DatabaseElement;
 import basicClassesFactory.DatabaseElementFactory;
@@ -29,9 +30,20 @@ class BookScoreModule extends AbstractModule {
   }
   
   @Provides
-  @Singleton Database<String, DatabaseElement> createrDatabase(String databaseName, LineStorageFactory lineStorageFactory) {
-	  return new Database<String, DatabaseElement>(lineStorageFactory.open(databaseName + KEYS),
-			  									   lineStorageFactory.open(databaseName + VALUES),
+  @Singleton 
+  @Named(BookScoreManager.REVIEWERS_DATA_BASE_NAME)
+  Database<String, DatabaseElement> createReviewDatabase(LineStorageFactory lineStorageFactory) {
+	  return new Database<String, DatabaseElement>(lineStorageFactory.open(BookScoreManager.REVIEWERS_DATA_BASE_NAME + KEYS),
+			  									   lineStorageFactory.open(BookScoreManager.REVIEWERS_DATA_BASE_NAME + VALUES),
+			  									   new StringFactory(), new DatabaseElementFactory());
+  }
+  
+  @Provides
+  @Singleton 
+  @Named(BookScoreManager.BOOKS_DATA_BASE_NAME)
+  Database<String, DatabaseElement> createBooksDatabase(LineStorageFactory lineStorageFactory) {
+	  return new Database<String, DatabaseElement>(lineStorageFactory.open(BookScoreManager.BOOKS_DATA_BASE_NAME + KEYS),
+			  									   lineStorageFactory.open(BookScoreManager.BOOKS_DATA_BASE_NAME + VALUES),
 			  									   new StringFactory(), new DatabaseElementFactory());
   }
 }
