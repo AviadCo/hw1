@@ -38,10 +38,6 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		this.reviewersDatabase = reviewersDatabase;
 	}
 	
-	public Database<String, DatabaseElement> createDatabase(String databaseName) {
-		return null;
-	}
-	
 	/**
 	 * 
 	 * @param reviewers - get list of reviewers from parser
