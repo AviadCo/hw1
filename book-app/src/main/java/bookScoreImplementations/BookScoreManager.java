@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -50,7 +51,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	  	reviewers.stream().forEach(r -> {
 	  		for(Review review : r.getReviewslist()) {
 	  			Review bookReview = new Review(r.getKey(), review.getScore());
-	  			DatabaseElement updateBook = booksMap.containsKey(bookReview.getId()) ? 
+	  			DatabaseElement updateBook = booksMap.containsKey(review.getId()) ? 
 	  					booksMap.get(review.getId()) : new DatabaseElement(review.getId());
 	  					
 	  			updateBook.addReview(bookReview);
@@ -62,25 +63,45 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 	  	return new ArrayList<DatabaseElement>(booksMap.values());
 	}
 	
+	private DatabaseElement removeDuplicatedElements(DatabaseElement reviewer) {
+	  	Map<String, Review> seen = new HashMap<String, Review>();
+			  	
+	  	/* Removing duplications of students and stores only the last student data */	  	
+		List<Review> reverseReviewList = reviewer.getReviewslist().subList(0, reviewer.getReviewslist().size());
+		Collections.reverse(reverseReviewList);
+		
+		List<Review> reviewList = reverseReviewList.stream()
+								.filter(s -> seen.putIfAbsent(s.getId(), s) == null)
+								.collect(Collectors.toList());
+		
+		return new DatabaseElement(reviewer.getId(), reviewList);
+	}
+	
 	/**
 	 * Gets xmlData of Reviewer with reviewer, parse it and initialize LineStorage database.
 	 */
 	@Override
 	public void setup(String XmlData) {
 		List<DatabaseElement> books;
-		List<DatabaseElement> reviewers;
+		List<DatabaseElement> reviewersWithDuplicates;
+		List<DatabaseElement> reviewersWithoutDuplicates = new ArrayList<DatabaseElement>();
+
 		
 		try {
-			reviewers = BookScoreParser.createListOfReviewers(XmlData);
+			reviewersWithDuplicates = BookScoreParser.createListOfReviewers(XmlData);
 		} catch (Exception e) {
 			e.printStackTrace();
 			
 			throw new RuntimeException();
 		}
+		
+		for (DatabaseElement reviewer : reviewersWithDuplicates) {
+			reviewersWithoutDuplicates.add(removeDuplicatedElements(reviewer));
+		}
 				
-		books = createListOfBooks(reviewers);
+		books = createListOfBooks(reviewersWithoutDuplicates);
 						
-		reviewersDatabase.add(reviewers);
+		reviewersDatabase.add(reviewersWithoutDuplicates);
 		booksDatabase.add(books);
 		
 		return;
@@ -153,7 +174,7 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 		}
 		
 		//TODO Aviad: did you mean element.get??
-		Integer sum = getReviewsForBook(elementId)
+		Integer sum = getAllReviewsOfElement(elementId, database)
 										.values()
 										.stream()
 										.mapToInt(score -> score)

@@ -141,13 +141,13 @@ public class BookScoreManagerTester {
 	public void getAverageReviewScoreForBookTest() {
 		OptionalDouble average = manager.getAverageReviewScoreForBook("Good");
 		
-		assertEquals((Double)average.getAsDouble(), Double.valueOf(7));
+		assertEquals((Double)average.getAsDouble(), Double.valueOf(9));
 		
-		average = manager.getScoreAverageForReviewer("Foobar");
+		average = manager.getAverageReviewScoreForBook("Foobar");
 		
 		assertEquals((Double)average.getAsDouble(), Double.valueOf(4));
 
-		average = manager.getScoreAverageForReviewer("NotExists");
+		average = manager.getAverageReviewScoreForBook("NotExists");
 		
 		assertFalse(average.isPresent());
 	}
