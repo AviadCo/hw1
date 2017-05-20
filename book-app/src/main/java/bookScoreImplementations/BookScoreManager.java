@@ -173,7 +173,6 @@ public class BookScoreManager implements BookScoreInitializer, BookScoreReader {
 			return OptionalDouble.empty();
 		}
 		
-		//TODO Aviad: did you mean element.get??
 		Integer sum = getAllReviewsOfElement(elementId, database)
 										.values()
 										.stream()

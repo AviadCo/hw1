@@ -25,8 +25,6 @@ class BookScoreModule extends AbstractModule {
   protected void configure() {
 	  bind(BookScoreInitializer.class).to(BookScoreManager.class);
 	  bind(BookScoreReader.class).to(BookScoreManager.class);
-	  //TODO remove this after testing
-	  bind(LineStorageFactory.class).to(MapBasedStorageFactory.class);
   }
   
   @Provides
